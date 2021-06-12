@@ -207,12 +207,12 @@ class Game:
 
     def steal(self,last_pocket):
         if last_pocket < 6:
-            self.game_list[6] += self.game_list[12-last_pocket]
+            self.game_list[6] += self.game_list[12-last_pocket]+1
             self.game_list[12-last_pocket] = 0
         elif last_pocket > 6:
-            self.game_list[13] += self.game_list[12-last_pocket]
+            self.game_list[13] += self.game_list[12-last_pocket]+1
             self.game_list[12-last_pocket] = 0
-            
+
     def next_move(self, pocket):
         j=pocket
         againturn=False
@@ -300,7 +300,7 @@ def minmax(state, depth, alpha, beta , Min_Max=True):
 bot=int(input('1 for player2 , 0 for player1 : '))# boot 1(plyer1) -> player2 
 stl =int(input('1 for stealing or 0 for without :'))
 mode=input('enter 0 for easy mode or 1 for hard mode : ')
-if mode =='0':
+if mode =='1':
     mod= 3
 else:
     mod=15
@@ -321,5 +321,5 @@ while(1):
     x = g1.cycle()
     #print(x)
     if x[0] ==1 :
-        #print(x[1])
+        print(x[1])
         break
