@@ -330,6 +330,10 @@ def play():
         #print(x)
         if x[0] ==1 :
             print(x[1])
+            if x[1][0]>x[1][1]:
+                print("player 1 victory")
+            else:
+                print("player 2 victory")
             break
     
 play()
