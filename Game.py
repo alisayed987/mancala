@@ -205,66 +205,43 @@ class Game:
             else:
                 return check_list[13]- check_list[6]
 
-    def next_move(self,bowl):
-        temp = bowl
-        added_stones = self.game_list[temp]
-        if bowl < 6:
-            while added_stones:
-                # add one stone in the bowl routation fron the next 
-                # one for which is chosed till the stone =0
-                bowl=(bowl+1)%14 # to return if it reach to the last bowl
-                # if the competitor mancla no put a stone just contunie
-                # if not increase the stone in bowl by one 
-                # if i end in my mancla so play again
-                if bowl != 13:
-                    self.game_list[bowl] = self.game_list[bowl]+1
+    def next_move(self, pocket):
+        j=pocket
+        againturn=False
+        add=self.game_list[j]
+        self.game_list[j] = 0
+        if pocket>6:
+            stones = add
+            while(stones>0):
+                pocket+=1
+                pocket=pocket % 14
+                if pocket==6 : continue
                 else:
-                    continue
-                added_stones=added_stones-1
-            if bowl != 6:
-                if self.stealing:
-                    # if i in 1 so opposite to me 11
-                    # we do stealing when my last stone fall in empty bowl
-                    # and opposite to it non empty bowl
-                    # so i put in my mancla all the stone in mine and his
-                    opp_bowl =12-bowl
-                    if self.game_list[bowl] ==1 and self.game_list[opp_bowl]!=0:
-                        add =self.game_list[opp_bowl]+self.game_list[bowl]
-                        self.game_list[6]=self.game_list[6]+add
-                        self.game_list[opp_bowl]=0
-                        self.game_list[bowl]=0
-            else:
-                #play again
-                return True
+                    self.game_list[pocket%14]+=1
+                stones-=1
+            if pocket>6 and self.game_list[pocket]==1 and pocket!=13 and self.game_list[5-(pocket-7)]!=0:
+                self.game_list[13]+=1+self.game_list[5-(pocket-7)]
+                self.game_list[pocket]=0
+                self.game_list[5-(pocket-7)]=0
+            if pocket==13:
+                againturn = True
         else:
-            while added_stones:
-                # add one stone in the bowl routation fron the next 
-                # one for which is chosed till the stone =0
-                bowl=(bowl+1)%14 # to return if it reach to the last bowl
-                # if the competitor mancla no put a stone just contunie
-                # if not increase the stone in bowl by one 
-                # if i end in my mancla so play again
-                if bowl != 6:
-                    self.game_list[bowl] = self.game_list[bowl]+1
-                else:
+            stones = add
+            while (stones > 0):
+                pocket += 1
+                pocket = pocket % 14
+                if pocket == 13:
                     continue
-                added_stones=added_stones-1
-            if bowl != 13:
-                if self.stealing:
-                    # if i in 11 so opposite to me 1
-                    # we do stealing when my last stone fall in empty bowl
-                    # and opposite to it non empty bowl
-                    # so i put in my mancla all the stone in mine and his
-                    opp_bowl =12-bowl
-                    if self.game_list[bowl] ==1 and self.game_list[opp_bowl]!=0:
-                        add =self.board[opp_bowl]+self.board[bowl]
-                        self.game_list[13]=self.game_list[13]+add
-                        self.game_list[opp_bowl]=0
-                        self.game_list[bowl]=0
-            else :
-                return True
-        return False
-
+                else:
+                    self.game_list[pocket%14] += 1
+                stones -= 1
+            if pocket < 6 and self.game_list[pocket] == 1 and pocket !=6 and self.game_list[-pocket + 12]!=0:
+                self.game_list[6] += 1 + self.game_list[-pocket + 12]
+                self.game_list[pocket] = 0
+                self.game_list[-pocket + 12] = 0
+            if pocket == 6:
+                againturn = True
+        return againturn
 def minmax(state, depth, alpha, beta , Min_Max=True):
 # recursion stop conditions
     if depth == 0 or state.end(state.game_list)[0]:
