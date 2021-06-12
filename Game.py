@@ -205,6 +205,14 @@ class Game:
             else:
                 return check_list[13]- check_list[6]
 
+    def steal(self,last_pocket):
+        if last_pocket < 6:
+            self.game_list[6] += self.game_list[12-last_pocket]
+            self.game_list[12-last_pocket] = 0
+        elif last_pocket > 6:
+            self.game_list[13] += self.game_list[12-last_pocket]
+            self.game_list[12-last_pocket] = 0
+            
     def next_move(self, pocket):
         j=pocket
         againturn=False
