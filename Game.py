@@ -51,3 +51,146 @@ class Game:
         print("|            |   "+str(state[0])+"    |   "+str(state[1])+"    |   "+str(state[2])+"    |   "+str(state[3])+"    |   "+str(state[4])+"    |   "+str(state[5])+"    |            |")
         print("|            |        |        |        |        |        |        |            |")
         print("---------------------------------------------------------------------------------")
+
+    def cycle(self):
+        player1 = self.player1
+        print("Turn:", player1)
+        if player1: #--------->player 1
+            if self.boot:
+                _,in_pocket = minmax(self,self.mode,-50000,50000,True)         #------------------------------------->rg3y el Ai INPUT hena (1)
+                print(in_pocket)
+            else:
+                user_in = input("choose a pocket (0:5) or q: ")
+                if user_in == "q":
+                    self.save_game['state_list']=self.game_list
+                    self.save_game['player'] = self.player1
+                    file = open("last.txt","a")
+                    file.write(str(self.save_game))
+                    file.close()
+                    return 1 ,"game saved"
+                elif int(user_in) < 13 :
+                    in_pocket = int(user_in)#---------------------------------------------------->input player 1
+                else:
+                    return 1, "wrong input (not q or pocket)"
+            pocket = in_pocket
+            self.switch_player()
+            if pocket <= 5:
+                if self.game_list[pocket] != 0:
+                    stones = self.game_list[pocket]
+                    loop_counter = 1
+                    next_pocket = 0
+                    while(stones>0):
+                        if next_pocket <13 and loop_counter<13:
+                            next_pocket =  pocket+loop_counter
+                            loop_counter+=1
+                            if next_pocket != 13:
+                                self.game_list[next_pocket] = self.game_list[next_pocket] + 1
+                                stones-=1
+                            
+                        else:
+                            next_pocket = 0
+                            pocket = 0
+                            loop_counter = 0
+                        
+                        if stones == 0 and next_pocket == 6:
+                            if self.end(self.game_list)[0] == 0 :
+                                self.switch_player()
+                        #steeeeeeeeeeeealinggggggggggggggggggggggggggggg
+                        if self.stealing:
+                            if stones == 0 and next_pocket<6 and self.game_list[next_pocket] == 1:
+                                self.steal(next_pocket)
+                               
+                                    
+                    self.game_list[in_pocket] = 0
+                    if self.end(self.game_list)[0] == 0:
+                        self.printBoard(self.game_list)
+                        return 0 ,"board printed"
+                    else:
+                        #print("22222")
+                        self.last_score = self.end(self.game_list)[1]
+                        self.printBoard(self.game_list)
+                        print("game finished")
+                        print("last score: ",self.last_score)
+                        return   1,self.last_score,self.game_list
+                        
+                else:
+                    self.switch_player()
+                    state ="empty pocket pick another one"
+                    print(state)
+                    return 0, state
+            else:
+                self.switch_player()
+                state = "wrong pocket input"
+                print(state) # valid       7:12
+                return 0,state
+        
+        elif not player1: #--------->player 2
+            if not self.boot:
+                _,in_pocket = minmax(self,self.mode,-50000,50000,True)  
+                print(in_pocket)       #------------------------------------->rg3y el Ai INPUT hena (2)
+            else:
+                user_in = input("choose a pocket (7:12) or q: ")
+                if user_in == "q":
+                    self.save_game['state_list']=self.game_list
+                    self.save_game['player'] = self.player1
+                    file = open("last.txt","a")
+                    file.write(self.save_game)
+                    file.close()
+                    return 1 ,"game saved"
+                elif int(user_in) <13 :
+                    in_pocket = int(user_in)
+                else:
+                    return 1, "wrong input (not q or pocket)"
+            pocket = in_pocket
+            self.switch_player()
+            if pocket in range(7,13):
+                if self.game_list[pocket] != 0:
+                    stones = self.game_list[pocket]
+                    loop_counter = 1
+                    next_pocket = 0
+                    while(stones>0):
+                        if next_pocket <13 and loop_counter<13:
+                            next_pocket =  pocket+loop_counter
+                            loop_counter+=1
+                            if next_pocket != 6:
+                                self.game_list[next_pocket] = self.game_list[next_pocket] + 1
+                                stones-=1
+                        else:
+                            next_pocket = 0
+                            pocket = 0
+                            loop_counter = 0
+                            
+                        
+                        if stones==0 and next_pocket == 13:
+                                if self.end(self.game_list)[0] == 0 :
+                                    self.switch_player()
+                        
+                        #steeeeeeeeeeeealinggggggggggggggggggggggggggggg
+                        if self.stealing:
+                            if stones == 0 and next_pocket in range(7,13) and self.game_list[next_pocket] == 1:
+                                self.steal(next_pocket)
+                                
+                    self.game_list[in_pocket] = 0
+                    
+                    if self.end(self.game_list)[0] == 0:
+                        self.printBoard(self.game_list)
+                        # return self.game_list
+                        return 0 ,"board printed"
+                    else:
+                        #print("1111")
+                        self.last_score = self.end(self.game_list)[1]
+                        self.printBoard(self.game_list)
+                        print("game finished")
+                        print("last score: ",self.last_score)
+                        return   1,self.last_score
+                        
+                else:
+                    self.switch_player()
+                    state ="empty pocket pick another one"
+                    print(state)
+                    return 0, state
+            else:
+                self.switch_player()
+                state = "wrong pocket input"
+                print(state) # valid       7:12
+                return 0,state
