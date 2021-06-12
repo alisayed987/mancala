@@ -194,3 +194,121 @@ class Game:
                 state = "wrong pocket input"
                 print(state) # valid       7:12
                 return 0,state
+    def cost(self,check_list):
+            if self.end(check_list)[0]:
+                if check_list[0]>check_list[6]:
+                    return 50
+                elif check_list[13]==check_list[6]:
+                    return 0
+                else :
+                    return -50
+            else:
+                return check_list[13]- check_list[6]
+
+    def next_move(self,bowl):
+        temp = bowl
+        added_stones = self.game_list[temp]
+        if bowl < 6:
+            while added_stones:
+                # add one stone in the bowl routation fron the next 
+                # one for which is chosed till the stone =0
+                bowl=(bowl+1)%14 # to return if it reach to the last bowl
+                # if the competitor mancla no put a stone just contunie
+                # if not increase the stone in bowl by one 
+                # if i end in my mancla so play again
+                if bowl != 13:
+                    self.game_list[bowl] = self.game_list[bowl]+1
+                else:
+                    continue
+                added_stones=added_stones-1
+            if bowl != 6:
+                if self.stealing:
+                    # if i in 1 so opposite to me 11
+                    # we do stealing when my last stone fall in empty bowl
+                    # and opposite to it non empty bowl
+                    # so i put in my mancla all the stone in mine and his
+                    opp_bowl =12-bowl
+                    if self.game_list[bowl] ==1 and self.game_list[opp_bowl]!=0:
+                        add =self.game_list[opp_bowl]+self.game_list[bowl]
+                        self.game_list[6]=self.game_list[6]+add
+                        self.game_list[opp_bowl]=0
+                        self.game_list[bowl]=0
+            else:
+                #play again
+                return True
+        else:
+            while added_stones:
+                # add one stone in the bowl routation fron the next 
+                # one for which is chosed till the stone =0
+                bowl=(bowl+1)%14 # to return if it reach to the last bowl
+                # if the competitor mancla no put a stone just contunie
+                # if not increase the stone in bowl by one 
+                # if i end in my mancla so play again
+                if bowl != 6:
+                    self.game_list[bowl] = self.game_list[bowl]+1
+                else:
+                    continue
+                added_stones=added_stones-1
+            if bowl != 13:
+                if self.stealing:
+                    # if i in 11 so opposite to me 1
+                    # we do stealing when my last stone fall in empty bowl
+                    # and opposite to it non empty bowl
+                    # so i put in my mancla all the stone in mine and his
+                    opp_bowl =12-bowl
+                    if self.game_list[bowl] ==1 and self.game_list[opp_bowl]!=0:
+                        add =self.board[opp_bowl]+self.board[bowl]
+                        self.game_list[13]=self.game_list[13]+add
+                        self.game_list[opp_bowl]=0
+                        self.game_list[bowl]=0
+            else :
+                return True
+        return False
+
+def minmax(state, depth, alpha, beta , Min_Max=True):
+# recursion stop conditions
+    if depth == 0 or state.end(state.game_list)[0]:
+        return state.cost(state.game_list),-1
+    #true -> max
+    if Min_Max == True:
+        old_alpa = -50000
+        bowl = -1
+        if state.player1:
+            start=0
+            end =6
+        else:
+            start=7
+            end =13
+        for i in range(start,end):
+            if state.game_list[i]==0: 
+                continue
+            s=Game()
+            s.game_list = state.game_list[:]
+            Min_Max = s.next_move(i)
+            new_alpha,_ =  minmax(s, depth-1, alpha, beta, Min_Max)
+            if old_alpa< new_alpha:
+                bowl=i
+                old_alpa =new_alpha
+            alpha = max(alpha, old_alpa)
+            if alpha >= beta :
+                break
+        return old_alpa, bowl
+    else:
+        old_beta = 50000
+        bowl = -1
+        for i in range(0, 6):
+            if state.game_list[i] == 0: 
+                continue
+            s = Game()
+            s.game_list = state.game_list[:]
+            Min_Max = s.next_move(i)
+            new_beta,_ = minmax(s, depth - 1, alpha, beta, not  Min_Max)
+            if old_beta > new_beta:
+                bowl = i
+                old_beta = new_beta
+            beta = min(beta, old_beta)
+            # cut off condition
+            if alpha >= beta:
+                break
+        return old_beta, bowl
+
