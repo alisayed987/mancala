@@ -312,3 +312,29 @@ def minmax(state, depth, alpha, beta , Min_Max=True):
                 break
         return old_beta, bowl
 
+bot=int(input('1 for player2 , 0 for player1 : '))# boot 1(plyer1) -> player2 
+stl =int(input('1 for stealing or 0 for without :'))
+mode=input('enter 0 for easy mode or 1 for hard mode : ')
+if mode =='0':
+    mod= 3
+else:
+    mod=15
+g1 = Game(stealing=stl,boot=bot,mode=mod)
+cont_in = int(input("continue last game? (enter 1,0): "))
+if cont_in ==1:
+    f = open("last.txt", "r")
+    read = ast.literal_eval(f.read())
+    board_start = read['state_list']
+    g1.player1 = read['player']
+    
+else:
+    board_start = [4,4,4,4,4,4,0,4,4,4,4,4,4,0]
+g1.game_list = board_start
+g1.printBoard(board_start) #draw first state 
+
+while(1):
+    x = g1.cycle()
+    #print(x)
+    if x[0] ==1 :
+        #print(x[1])
+        break
