@@ -229,10 +229,11 @@ class Game:
                 else:
                     self.game_list[pocket%14]+=1
                 stones-=1
-            if pocket>6 and self.game_list[pocket]==1 and pocket!=13 and self.game_list[5-(pocket-7)]!=0:
-                self.game_list[13]+=1+self.game_list[5-(pocket-7)]
-                self.game_list[pocket]=0
-                self.game_list[5-(pocket-7)]=0
+            if self.stealing:
+                if pocket>6 and self.game_list[pocket]==1 and pocket!=13 and self.game_list[5-(pocket-7)]!=0:
+                    self.game_list[13]+=1+self.game_list[5-(pocket-7)]
+                    self.game_list[pocket]=0
+                    self.game_list[5-(pocket-7)]=0
             if pocket==13:
                 againturn = True
         else:
@@ -245,10 +246,11 @@ class Game:
                 else:
                     self.game_list[pocket%14] += 1
                 stones -= 1
-            if pocket < 6 and self.game_list[pocket] == 1 and pocket !=6 and self.game_list[-pocket + 12]!=0:
-                self.game_list[6] += 1 + self.game_list[-pocket + 12]
-                self.game_list[pocket] = 0
-                self.game_list[-pocket + 12] = 0
+            if self.stealing:
+                if pocket < 6 and self.game_list[pocket] == 1 and pocket !=6 and self.game_list[-pocket + 12]!=0:
+                    self.game_list[6] += 1 + self.game_list[-pocket + 12]
+                    self.game_list[pocket] = 0
+                    self.game_list[-pocket + 12] = 0
             if pocket == 6:
                 againturn = True
         return againturn
@@ -299,29 +301,41 @@ def minmax(state, depth, alpha, beta , Min_Max=True):
                 break
         return old_beta, bowl
 
-bot=int(input('1 for player2 , 0 for player1 : '))# boot 1(plyer1) -> player2 
-stl =int(input('1 for stealing or 0 for without :'))
-mode=input('enter 0 for easy mode or 1 for hard mode : ')
-if mode =='1':
-    mod= 3
-else:
-    mod=15
-g1 = Game(stealing=stl,boot=bot,mode=mod)
-cont_in = int(input("continue last game? (enter 1,0): "))
-if cont_in ==1:
-    f = open("last.txt", "r")
-    read = ast.literal_eval(f.read())
-    board_start = read['state_list']
-    g1.player1 = read['player']
-    
-else:
-    board_start = [4,4,4,4,4,4,0,4,4,4,4,4,4,0]
-g1.game_list = board_start
-g1.printBoard(board_start) #draw first state 
+def play():
+    bot=int(input('1 for player2 , 0 for player1 : '))# boot 1(plyer1) -> player2 
+    stl =int(input('1 for stealing or 0 for without :'))
+    mode=input('enter 0 for easy mode or 1 for hard mode : ')
+    if mode =='1':
+        mod= 3
+    elif mode == '0':
+        mod=15
+    else:
+        print("not valid")
+        return
+    g1 = Game(stealing=stl,boot=bot,mode=mod)
+    cont_in = int(input("continue last game? (enter 1,0): "))
+    if cont_in ==1:
+        f = open("last.txt", "r")
+        read = ast.literal_eval(f.read())
+        board_start = read['state_list']
+        g1.player1 = read['player']
+        
+    else:
+        board_start = [4,4,4,4,4,4,0,4,4,4,4,4,4,0]
+    g1.game_list = board_start
+    g1.printBoard(board_start) #draw first state 
 
+    while(1):
+        x = g1.cycle()
+        #print(x)
+        if x[0] ==1 :
+            print(x[1])
+            break
+    
+play()
 while(1):
-    x = g1.cycle()
-    #print(x)
-    if x[0] ==1 :
-        print(x[1])
+    play_again = int(input("press 1 to play again  "))
+    if play_again:
+        play()
+    else:
         break
